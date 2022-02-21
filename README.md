@@ -6,3 +6,5 @@ To run this project just do
 yarn
 yarn dev
 ```
+
+created with Vue3, Typescript, Vite, Pinia, Vue Router
