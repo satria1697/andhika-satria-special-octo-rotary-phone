@@ -28,7 +28,7 @@ export const useProductStore = defineStore('product', {
             this.productFilter.page = payload?.page ?? 1
             let res: Array<Product> = []
             try {
-                let result = await getProducts(payload)
+                const result = await getProducts(payload)
                 res = result.data.data
             } catch (e) {
                 console.log(e)
@@ -38,7 +38,7 @@ export const useProductStore = defineStore('product', {
         async getCategories() {
             let res: Array<Category> = []
             try {
-                let result = await getCategories()
+                const result = await getCategories()
                 res = result.data.data
             } catch (e) {
                 console.log(e)
@@ -59,7 +59,7 @@ export const useProductStore = defineStore('product', {
             }
             let res: Array<Product> = []
             try {
-                let result = await getProducts(payload)
+                const result = await getProducts(payload)
                 res = result.data.data
             } catch (e) {
                 console.log(e)

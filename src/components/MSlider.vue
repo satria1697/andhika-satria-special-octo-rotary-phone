@@ -34,12 +34,30 @@ const handlePosition = (state: 'next' | 'prev') => {
 
 <template>
   <div class="flex justify-center items-center h-full relative group">
-    <div v-if="images.length" @click="handlePosition('prev')" class="left-2 chev">
-      <icon class="text-4xl" icon="fa6-solid:circle-chevron-left" />
+    <div
+      v-if="images.length"
+      class="left-2 chev"
+      @click="handlePosition('prev')"
+    >
+      <icon
+        class="text-4xl"
+        icon="fa6-solid:circle-chevron-left"
+      />
     </div>
-    <img :alt="productName" class="rounded-md max-w-full" :src="images[position]"/>
-    <div v-if="images.length" @click="handlePosition('next')" class="right-2 chev">
-      <icon class="text-4xl" icon="fa6-solid:circle-chevron-right" />
+    <img
+      :alt="productName"
+      class="rounded-md max-w-full"
+      :src="images[position]"
+    >
+    <div
+      v-if="images.length"
+      class="right-2 chev"
+      @click="handlePosition('next')"
+    >
+      <icon
+        class="text-4xl"
+        icon="fa6-solid:circle-chevron-right"
+      />
     </div>
   </div>
 </template>
