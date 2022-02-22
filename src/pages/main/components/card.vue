@@ -39,7 +39,10 @@ const calculateDiscount = (price: number, discount: number): string => {
         <icon class="text-amber-300" v-for="i in product.rating" :key="i" icon="fa6-solid:star"/>
       </div>
       <div class="flex space-x-2 items-center">
-        <icon v-if="product.is_priority_store" icon="fa6-solid:circle-check"/>
+        <icon class="text-blue-400" v-if="product.is_priority_store" icon="fa6-solid:circle-check"/>
+        <span>{{product.seller_name}}</span>
+        <span>|</span>
+        <icon icon="fa6-solid:location-dot"></icon>
         <span>{{ product.city_name }}</span>
       </div>
     </div>
