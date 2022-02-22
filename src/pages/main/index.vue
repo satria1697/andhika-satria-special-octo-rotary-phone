@@ -2,7 +2,8 @@
 import {computed, onMounted, ref} from "vue";
 import {useProductStore} from "../../store/Product";
 import {ProductSearchRequest} from "../../entities/request/product";
-import MSlider from "../../components/MSlider.vue"
+import Card from "./components/card.vue";
+import {Product} from "../../entities/Product";
 
 const productStore = useProductStore()
 
@@ -16,17 +17,7 @@ const categories = computed(() => productStore.categories)
 
 const productPage = computed(() => productStore.productFilter.page)
 
-const numberFormat = (number: number) => new Intl.NumberFormat('id-ID', {
-  style: 'currency',
-  currency: 'IDR'
-}).format(number)
-
-const calculateDiscount = (price: number, discount: number): string => {
-  if (discount !== 0) {
-    return numberFormat(price * ((100 - discount) / 100))
-  }
-  return numberFormat(price)
-}
+let recommendProduct = ref<Product[]>([])
 
 const handleSelectCategory = async (category: string) => {
   isLoading.value.product = true
@@ -57,23 +48,24 @@ const handleNavigate = async (state: 'next' | 'prev') => {
 onMounted(async () => {
   await productStore.getProducts()
   await productStore.getCategories()
+  recommendProduct.value = await productStore.getRecommendProduct()
   isLoading.value.init = false
 })
 </script>
 
 <template>
   <div class="flex flex-col w-screen h-screen overflow-x-hidden">
-    <div class="flex mb-4 shadow-2xl p-4">
+    <div class="flex mb-2 border-b-2 p-4">
       <span class="text-3xl font-semibold">Pasarwarga</span>
     </div>
     <div class="w-full h-full grid place-items-center" v-if="isLoading.init">
       <span class="animate-pulse">Loading Data</span>
     </div>
     <template v-else>
-      <div class="px-4 flex justify-center mb-4">
-        <div class="flex flex-1 overflow-x-auto w-full space-x-2">
+      <div class="px-4 mb-2s flex justify-center mb-2 shadow-md">
+        <div class="flex flex-1 overflow-x-auto w-full space-x-2 mb-2">
           <div v-for="(cat, i) in categories" :key="i"
-               class="group py-1 px-2 rounded-full text-white bg-blue-500 cursor-pointer hover:bg-blue-400 transition"
+               class="group py-1 px-2 transition cursor-pointer hover:bg-gray-200"
                @click="cat.child?.length ? '': handleSelectCategory(cat.slug)">
             <span>{{ cat.category_name }}</span>
             <div v-if="cat.child?.length" class="absolute z-20 invisible group-hover:visible">
@@ -87,33 +79,32 @@ onMounted(async () => {
           </div>
         </div>
       </div>
-      <div class="px-20 h-full">
+      <div class="px-20 h-full mt-4">
         <div v-if="isLoading.product" class="w-full h-full grid place-items-center">
           <span class="animate-pulse">Is Loading</span>
         </div>
         <template v-else>
+          <div class="flex flex-col pb-6 space-y-2">
+            <span class="title">Product Recommendation</span>
+            <div class="grid grid-cols-4 gap-24">
+              <card
+                  v-for="(opt, idx) in recommendProduct"
+                  :product="opt"
+                  :key="idx"
+              />
+            </div>
+          </div>
           <div v-if="!products.length" class="w-full h-full grid place-items-center">
             <span>Tidak ada data</span>
           </div>
-          <div v-else class="grid grid-cols-4 gap-24">
-            <div
-                v-for="(opt, idx) in products"
-                class="border border-gray-600 rounded-md flex flex-col justify-between itemscen"
-                :key="idx"
-            >
-              <m-slider :images="opt.images" :product-name="opt.product_name" />
-              <div class="p-4 flex flex-col">
-                <span>{{ opt.product_name }}</span>
-                <div class="flex justify-between">
-                  <span :class="{'line-through': opt.discount !== 0}" class="stroke-2">{{
-                      numberFormat(opt.price)
-                    }}</span>
-                  <span v-if="opt.discount !== 0">{{ calculateDiscount(opt.price, opt.discount) }}</span>
-                </div>
-                <div>
-                  <span>{{ opt.city_name }}</span>
-                </div>
-              </div>
+          <div v-else class="flex flex-col space-y-2">
+            <span class="title">Produk Lainnya</span>
+            <div class="grid grid-cols-4 gap-24">
+              <card
+                  v-for="(opt, idx) in products"
+                  :product="opt"
+                  :key="idx"
+              />
             </div>
           </div>
           <div v-if="products.length" class="flex w-full justify-end pb-10">
@@ -131,6 +122,10 @@ onMounted(async () => {
 <style scoped>
 .btn {
   @apply bg-green-400 text-white py-2 px-4 rounded-md disabled:bg-gray-600 disabled:cursor-not-allowed
+}
+
+.title {
+  @apply text-3xl font-bold
 }
 </style>
 

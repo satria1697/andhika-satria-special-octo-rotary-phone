@@ -26,17 +26,45 @@ export const useProductStore = defineStore('product', {
     actions: {
         async getProducts(payload?: ProductSearchRequest) {
             this.productFilter.page = payload?.page ?? 1
-            const res = await getProducts(payload)
-            this.products = res.data.data
+            let res: Array<Product> = []
+            try {
+                let result = await getProducts(payload)
+                res = result.data.data
+            } catch (e) {
+                console.log(e)
+            }
+            this.products = res
         },
         async getCategories() {
-            const res = await getCategories()
-            const groupBy = _.chain<Category>(res.data.data).filter((value: Category) => !!value.status).groupBy('parent_id').value()
-            const parent: [Category, ...Category[]] = groupBy["0"];
-            this.categories = parent.map<CategoryMap>((value: Category) => ({
-                ...value,
-                child: groupBy[value.id]
-            }))
+            let res: Array<Category> = []
+            try {
+                let result = await getCategories()
+                res = result.data.data
+            } catch (e) {
+                console.log(e)
+            }
+            if (res.length) {
+                const groupBy = _.chain<Category>(res).filter((value: Category) => !!value.status).groupBy('parent_id').value()
+                const parent: [Category, ...Category[]] = groupBy["0"];
+                this.categories = parent.map<CategoryMap>((value: Category) => ({
+                    ...value,
+                    child: groupBy[value.id]
+                }))
+            }
+        },
+        async getRecommendProduct(){
+            const payload: ProductSearchRequest = {
+                page: 20,
+                perPage: 2
+            }
+            let res: Array<Product> = []
+            try {
+                let result = await getProducts(payload)
+                res = result.data.data
+            } catch (e) {
+                console.log(e)
+            }
+            return res
         }
     }
 })
